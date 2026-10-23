@@ -238,5 +238,24 @@ img{max-width:100%}
 </footer>
 
 </div>
+<script>
+(function(){
+  var noms={instagram:'Instagram',tiktok:'TikTok',linkedin:'LinkedIn',facebook:'Facebook'};
+  var s=null;
+  try{s=new URLSearchParams(location.search).get('src');}catch(e){}
+  try{ if(s&&noms[s]){sessionStorage.setItem('zdg_src',s);} else {s=sessionStorage.getItem('zdg_src');} }catch(e){}
+  try{ if(location.search){history.replaceState(null,'',location.pathname+location.hash);} }catch(e){}
+  if(!s||!noms[s]) return;
+  var vu='je vous ai découvert sur '+noms[s]+'. ';
+  document.querySelectorAll('a[href^="https://wa.me/"]').forEach(function(a){
+    try{var u=new URL(a.href);var txt=u.searchParams.get('text')||'';
+      u.searchParams.set('text',txt.replace('Bonjour Thierry, ','Bonjour Thierry, '+vu.charAt(0).toUpperCase()+vu.slice(1)));
+      a.href=u.toString();}catch(e){}
+  });
+  document.querySelectorAll('a[href^="mailto:"]').forEach(function(a){
+    a.href=a.href.replace(/subject=([^&]*)/,function(m,x){return 'subject='+x+encodeURIComponent(' ('+noms[s]+')');});
+  });
+})();
+</script>
 </body>
 </html>
