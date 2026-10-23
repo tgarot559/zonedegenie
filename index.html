@@ -246,10 +246,10 @@ img{max-width:100%}
   try{ if(s&&noms[s]){sessionStorage.setItem('zdg_src',s);} else {s=sessionStorage.getItem('zdg_src');} }catch(e){}
   try{ if(location.search){history.replaceState(null,'',location.pathname+location.hash);} }catch(e){}
   if(!s||!noms[s]) return;
-  var vu='je vous ai découvert sur '+noms[s]+'. ';
+  var vu='je vous ai découvert sur '+noms[s]+' et je ';
   document.querySelectorAll('a[href^="https://wa.me/"]').forEach(function(a){
     try{var u=new URL(a.href);var txt=u.searchParams.get('text')||'';
-      u.searchParams.set('text',txt.replace('Bonjour Thierry, ','Bonjour Thierry, '+vu.charAt(0).toUpperCase()+vu.slice(1)));
+      u.searchParams.set('text',txt.replace('Bonjour Thierry, je ','Bonjour Thierry, '+vu));
       a.href=u.toString();}catch(e){}
   });
   document.querySelectorAll('a[href^="mailto:"]').forEach(function(a){
