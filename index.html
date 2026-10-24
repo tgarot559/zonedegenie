@@ -32,6 +32,17 @@ html{scroll-behavior:smooth}
 body{margin:0;background:#14117A}
 a{color:#FFF200}a:hover{color:#FFFFFF}
 img{max-width:100%}
+.zdg-cases{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:24px;align-items:start}
+.zdg-case{background:#fff;color:#14117A;border-top:6px solid #FFF200;border-radius:16px;padding:28px;min-width:0;box-sizing:border-box}
+.zdg-case:nth-child(2){border-color:#FF2BD6}.zdg-case:nth-child(3){border-color:#FF7A1A}
+.zdg-case-label{margin:0 0 12px;color:#9C116F;font-weight:800}
+.zdg-case h3{font:400 30px/1.15 Anton,sans-serif;text-transform:uppercase;margin:0 0 18px}
+.zdg-case-note{font-size:14px;line-height:1.55;color:#505075}
+.zdg-case summary{cursor:pointer;font-weight:800;padding:16px 0;border-top:1px solid #dcdceb}
+.zdg-case summary:focus-visible{outline:3px solid #1B18A6;outline-offset:4px}
+.zdg-case h4{font-size:18px;margin:24px 0 8px;color:#9C116F}
+.zdg-case details p{font-size:17px;line-height:1.65;margin:0 0 14px}
+.zdg-case .zdg-case-close{border-top:1px solid #dcdceb;padding-top:18px;margin-top:22px}
 </style>
 </head>
 <body>
@@ -135,26 +146,50 @@ img{max-width:100%}
 </div>
 </section>
 
-<section style="padding: 0 24px 112px;">
-<div style="max-width: 1240px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 56px; align-items: center;">
-<div style="flex: 1 1 360px; min-width: 0; display: flex; flex-direction: column; gap: 20px;">
-<div style="align-self: flex-start; padding: 6px 16px; background: #FFF200; color: #14117A; font-family: 'Anton', sans-serif; font-size: 20px; letter-spacing: 2px; text-transform: uppercase;">Ce que vous recevez</div>
-<h2 style="margin: 0; font-family: 'Anton', sans-serif; font-weight: 400; font-size: clamp(40px, 5vw, 72px); line-height: 1; text-transform: uppercase;">Un éclairage. <span style="color: #FF2BD6;">Par écrit.</span> Le jour même.</h2>
-<p style="margin: 0; color: #E6E6FF;">Après l'appel, vous recevez le jour même une synthèse personnalisée : une formulation de l'aptitude identifiée, les indices entendus pendant notre échange et une première action concrète pour la mettre à l'épreuve. Vous gardez la liberté de confirmer, nuancer ou écarter cette piste.</p>
-<p style="margin: 0; font-size: 16px; color: #C9C9F0;">Exemple fictif, pour vous montrer la forme.</p>
-</div>
-<div style="flex: 1 1 440px; min-width: 0; background: #FFFFFF; color: #14117A; padding: 40px 36px; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px; transform: rotate(-1.2deg); box-shadow: 14px 14px 0 #FFF200;">
-<div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; font-size: 15px; color: #4A4A7A;"><span>Zone de génie · Claire, dirigeante de PME</span><span>Appel du 14 novembre</span></div>
-<div style="font-family: 'Anton', sans-serif; font-size: 18px; letter-spacing: 2px; text-transform: uppercase; color: #C0128F;">Votre zone de génie</div>
-<p style="margin: 0; font-family: 'Anton', sans-serif; font-size: 34px; line-height: 1.1; text-transform: uppercase;">Vous rendez simple ce qui fait peur aux autres.</p>
-<div style="font-family: 'Anton', sans-serif; font-size: 18px; letter-spacing: 2px; text-transform: uppercase; color: #C0128F;">Ce que j'ai entendu</div>
-<p style="margin: 0; color: #2A2A5C;">Trois fois, vous avez dit « c'était pas si compliqué » en parlant d'un dossier que toute votre équipe fuyait. Vous ne vous en vantez pas. Vous ne le remarquez même plus.</p>
-<div style="font-family: 'Anton', sans-serif; font-size: 18px; letter-spacing: 2px; text-transform: uppercase; color: #C0128F;">Votre premier pas</div>
-<p style="margin: 0; color: #2A2A5C;">Cette semaine, prenez le dossier que personne ne veut. Notez le temps qu'il vous faut pour le démêler. C'est là que vous valez le plus cher.</p>
-<p style="margin: 0; font-weight: 800;">Thierry</p>
-</div>
-</div>
-</section>
+<section style="padding:0 24px 32px"><div style="max-width:1240px;margin:auto">
+<h2 style="font:400 clamp(36px,5vw,64px)/1.1 Anton,sans-serif;text-transform:uppercase">Un éclairage. <span style="color:#FF2BD6">Par écrit.</span> Le jour même.</h2>
+<p style="max-width:850px;color:#E6E6FF">Après l’appel, vous recevez une synthèse personnalisée : l’éclairage sur votre singularité, les éléments de notre échange qui le nourrissent et, lorsque cela s’y prête, des pistes concrètes et un point de vigilance. Un écrit à relire et à laisser mûrir à votre rythme.</p>
+</div></section>
+<section id="exemples" style="padding:64px 24px 96px">
+<div style="max-width:1240px;margin:auto">
+<p style="color:#FFF200;font-weight:800">Un aperçu de mon regard</p>
+<h2 style="margin:0 0 24px;font:400 clamp(36px,5vw,64px)/1.1 Anton,sans-serif;text-transform:uppercase">Une singularité.<br><span style="color:#FF2BD6">Plusieurs façons de l’exprimer.</span></h2>
+<p style="max-width:820px;color:#E6E6FF;margin-bottom:32px">Dans la vie personnelle, à la tête d’une entreprise ou au sein d’une équipe : ces exemples montrent comment un éclairage sur soi peut ouvrir des pistes concrètes. Chaque échange reste singulier ; ces situations ne préjugent pas de ce qui émergera pour vous.</p>
+<div class="zdg-cases"><article class="zdg-case">
+<p class="zdg-case-label">Vie personnelle</p>
+<h3>Vous rendez l’appartenance possible.</h3>
+<p class="zdg-case-note">Exemple inspiré d’un échange réel, anonymisé et reformulé avec l’accord de la personne concernée. Récit et synthèse reconstitués pour présenter la démarche ; les formulations ne sont pas des citations verbatim.</p>
+<details open><summary>Découvrir la situation et l’éclairage</summary>
+<h4>Ce que vous racontez</h4><p>Dans les réunions de famille, vous remarquez la personne qui ne parle pas. Vous trouvez une question ou un sujet pour lui permettre d’entrer dans la conversation. Vous faites aussi spontanément le lien entre une nouvelle connaissance et votre entourage.</p>
+<h4>L’éclairage que je vous propose</h4><p>Ce qui retient mon attention, c’est votre manière de percevoir la place que chacun occupe — et celle qu’il n’arrive pas à prendre. Vous semblez sentir quand une personne reste au bord du groupe, puis trouver un geste simple pour lui ouvrir une place sans l’exposer.</p>
+<h4>Des pistes pour vous</h4><p>Vous pouvez reconnaître cette force dans votre manière d’accueillir, de réunir ou de transmettre. Laissez cet éclairage vous accompagner dans les moments où vous créez naturellement du lien.</p>
+<h4>Un point de vigilance</h4><p>Faire une place à chacun ne vous oblige pas à devenir responsable du bien-être de tout le monde.</p>
+<p class="zdg-case-close">Cet éclairage vous appartient. Vous êtes libre de l’accueillir, de le nuancer et de le laisser mûrir à votre rythme.</p>
+<p><strong>Thierry</strong></p></details></article>
+<article class="zdg-case">
+<p class="zdg-case-label">Dirigeant</p>
+<h3>Vous rendez l’appartenance possible.</h3>
+<p class="zdg-case-note">Exemple inspiré d’un échange réel, anonymisé et reformulé avec l’accord de la personne concernée. Récit et synthèse reconstitués pour présenter la démarche ; les formulations ne sont pas des citations verbatim.</p>
+<details><summary>Découvrir la situation et l’éclairage</summary>
+<h4>Ce que vous racontez</h4><p>Lorsqu’une personne rejoint votre entreprise, vous cherchez ce qui pourrait l’empêcher de trouver sa place. En réunion, vous remarquez les collaborateurs qui n’interviennent plus et cherchez à les faire participer sans les mettre en difficulté.</p>
+<h4>L’éclairage que je vous propose</h4><p>Vous semblez percevoir les obstacles discrets qui empêchent une personne de contribuer au collectif. Votre force pourrait être de créer les conditions pour qu’elle trouve sa place et ose prendre part à la vie de l’équipe.</p>
+<h4>Des pistes pour vous</h4><p>Cette attention peut servir l’accueil d’un collaborateur ou l’accompagnement d’un changement. Une piste : demander individuellement ce qui aide chacun à contribuer et ce qui le retient, en laissant les réponses vous surprendre.</p>
+<h4>Un point de vigilance</h4><p>Percevoir un retrait ne permet pas d’en connaître la raison. Votre intuition peut ouvrir une conversation ; la parole de l’autre vient l’éclairer.</p>
+<p class="zdg-case-close">Cet éclairage vous appartient. Vous êtes libre de l’accueillir, de le nuancer et de le laisser mûrir à votre rythme.</p>
+<p><strong>Thierry</strong></p></details></article>
+<article class="zdg-case">
+<p class="zdg-case-label">Salarié</p>
+<h3>Vous rendez accessible ce qui semblait compliqué.</h3>
+<p class="zdg-case-note">Exemple inspiré d’un échange réel, anonymisé et reformulé avec l’accord de la personne concernée. Récit et synthèse reconstitués pour présenter la démarche ; les formulations ne sont pas des citations verbatim.</p>
+<details><summary>Découvrir la situation et l’éclairage</summary>
+<h4>Ce que vous racontez</h4><p>Vos collègues viennent vous voir lorsqu’ils ne comprennent pas une consigne. Vous cherchez un exemple et expliquez autrement. Vous aidez aussi les nouveaux arrivants à comprendre les habitudes implicites du service.</p>
+<h4>L’éclairage que je vous propose</h4><p>Vous semblez repérer l’endroit précis où la compréhension se perd. Vous trouvez alors un passage entre la manière dont une information est formulée et celle dont une personne peut se l’approprier.</p>
+<h4>Des pistes pour vous</h4><p>Cette force peut s’exprimer dans la transmission d’un savoir-faire ou les échanges entre services. Vous pourriez en parler à votre responsable avec un exemple concret et proposer une contribution délimitée : clarifier un support ou accompagner une prise en main.</p>
+<h4>Un point de vigilance</h4><p>Cette facilité peut devenir un travail invisible si vous êtes sollicité en permanence. Lui donner une place reconnue suppose aussi d’en définir les limites.</p>
+<p class="zdg-case-close">Cet éclairage vous appartient. Vous êtes libre de l’accueillir, de le nuancer et de le laisser mûrir à votre rythme.</p>
+<p><strong>Thierry</strong></p></details></article></div>
+<p style="margin:32px 0 0"><a href="#reserver" style="font-weight:800">Et vous, quel regard portez-vous sur votre singularité ? Réserver mon échange →</a></p>
+</div></section>
 
 <section id="reserver" style="padding: 32px 24px 112px;">
 <div style="max-width: 1240px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 48px; align-items: center;">
@@ -211,7 +246,7 @@ img{max-width:100%}
 </div>
 <div style="display: flex; flex-direction: column; gap: 8px; border-top: 3px solid #FFF200; padding-top: 22px;">
 <h3 style="margin: 0; font-family: 'Anton', sans-serif; font-weight: 400; font-size: 28px; text-transform: uppercase;">Ce qu'on se dit reste entre nous ?</h3>
-<p style="margin: 0; color: #E6E6FF;">Oui. Rien n'est enregistré, rien n'est partagé.</p>
+<p style="margin: 0; color: #E6E6FF;">Oui. L’appel n’est pas enregistré. Aucun contenu de notre échange n’est publié sans votre accord explicite ; les exemples présentés sur cette page sont anonymisés et reformulés avec autorisation.</p>
 </div>
 </div>
 </section>
