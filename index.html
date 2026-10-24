@@ -36,6 +36,14 @@ header{border-bottom:1px solid var(--line);background:var(--paper)}.nav{min-heig
 .letter-invite{max-width:900px;margin:28px auto 0;display:flex;gap:22px;align-items:center;justify-content:center;flex-wrap:wrap;text-align:center}
 .letter-invite p{margin:0;font-family:Lora,Georgia,serif;font-size:20px}
 @media(max-width:600px){.personal-letter{padding:50px 0}.letter-paper{padding:28px 25px}.letter-body{font-size:26px;line-height:1.45}.letter-body .letter-key{font-size:29px}.letter-signature{font-size:42px}.letter-invite{gap:16px}.letter-invite p{font-size:18px}}
+
+.gift-guide{display:grid;grid-template-columns:160px 1fr;gap:30px;align-items:center;background:#fffdf8;border:1px solid #d7cddd;border-radius:12px;padding:28px;margin:28px 0 20px}
+.gift-cover{background:#faf7f2;border:1px solid #dedbd6;border-left:5px solid #655181;border-radius:3px;padding:21px 16px;min-height:205px;box-shadow:5px 6px 15px rgba(35,51,69,.06);display:flex;flex-direction:column;justify-content:space-between}
+.gift-cover-label{font:700 8px/1.4 'DM Sans',sans-serif;letter-spacing:.09em;color:#655181}
+.gift-cover-title{font:500 21px/1.2 Lora,Georgia,serif;color:#233345;margin:18px 0}
+.gift-cover-author{font-size:10px;color:#655181}
+.gift-copy h3{font-size:25px;margin:8px 0 14px}.gift-copy p{font-size:15px;margin-bottom:12px}.gift-copy .small{font-size:12px;margin:0}
+@media(max-width:600px){.gift-guide{grid-template-columns:1fr;padding:24px;gap:24px}.gift-cover{width:150px;min-height:195px;margin:auto}.gift-copy h3{font-size:24px}}
 </style><link rel="icon" href="/favicon-v2.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32-v2.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon-v2.png">
@@ -126,6 +134,7 @@ header{border-bottom:1px solid var(--line);background:var(--paper)}.nav{min-heig
 <details><summary>Et si aucune piste convaincante n’émerge ?</summary><p>Je vous le dis franchement. Je ne force pas une conclusion pour produire une jolie formule. Je vous partage honnêtement ce que l’échange a permis, ou non, d’éclairer.</p></details>
 <details><summary>Notre échange reste-t-il confidentiel ?</summary><p>Oui. L’appel n’est pas enregistré. Aucun contenu de notre échange n’est publié sans votre accord explicite. Les exemples de cette page sont anonymisés et reformulés avec autorisation.</p></details></div></section>
 <section id="reserver" class="section booking"><div class="wrap"><div class="booking-head"><div><p class="eyebrow">Votre rendez-vous</p><h2>Accordez-vous un autre regard.</h2><p style="max-width:660px;margin:0">Un échange téléphonique de 20 minutes avec moi, centré sur votre vécu, mon écoute et l’éclairage que je vous partage de vive voix.</p></div><div class="price">90 € <small>TTC</small></div></div>
+<aside class="gift-guide" aria-label="Le guide offert après votre entretien"><div class="gift-cover" aria-hidden="true"><span class="gift-cover-label">VOTRE ZONE DE GÉNIE</span><span class="gift-cover-title">Le temps<br>de laisser<br>mûrir</span><span class="gift-cover-author">Thierry Garot · Guide PDF</span></div><div class="gift-copy"><p class="eyebrow" style="margin:0">Offert après notre échange</p><h3>Pour laisser les mots faire leur chemin.</h3><p>Après votre entretien, je vous offre <em>Le temps de laisser mûrir</em> : un guide PDF de six pages pour accueillir ce qui résonne, reconnaître vos forces et leurs limites, et explorer une piste à votre rythme.</p><p>Quelques questions, sans exercice obligatoire ni réponse à réussir. Vous y revenez quand vous en avez envie.</p><p class="small">Un guide commun à tous les participants, inclus dans les 90 € TTC. Il ne constitue pas une restitution personnalisée de l’entretien.</p></div></aside>
 <div class="actions"><a class="btn" href="https://cal.com/votrezonedegenie/20min" target="_blank" rel="noopener noreferrer">Choisir mon créneau sur Cal.com ↗</a><a href="mailto:thierry.garot@iroko-conseil.pro">Une question ? Écrivez-moi</a></div>
 <p class="small">Réservation et paiement sur Cal.com. Votre rendez-vous est confirmé après paiement.</p>
 <div class="calendar"><h3>Choisissez votre créneau</h3><div id="cal-embed" aria-label="Calendrier de réservation Cal.com"></div><p class="small" style="margin-top:18px">Le calendrier ne s’affiche pas ? <a href="https://cal.com/votrezonedegenie/20min" target="_blank" rel="noopener noreferrer">Ouvrir la réservation dans un nouvel onglet ↗</a></p></div></div></section>
