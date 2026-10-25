@@ -27,7 +27,7 @@ Le texte est écrit à la première personne à partir des éléments de parcour
 Les quatre cas sont explicitement fictifs. Pour utiliser des situations réelles, les remplacer par des récits factuels validés et autorisés sans attribuer aux personnes des résultats non documentés.
 
 ## Si tu prends du retard
-À la fin de la slide 12, repère de temps prévu : 24 min 30.
+À la fin de la slide 12, repère de temps prévu : 24 min.
 Si tu as 2 à 3 minutes de retard, raccourcir la synthèse 13 et les développements de 19 ou 20 selon le public ; conserver leur idée essentielle.
 Ne pas supprimer le cadre de nuance, de liberté et de limites. Garder la conclusion.
 Demander à l’organisateur avant de réduire le temps de questions. Arrêter la conférence à l’horaire prévu.
