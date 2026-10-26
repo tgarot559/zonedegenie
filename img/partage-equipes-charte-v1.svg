@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+ <rect width="1200" height="630" fill="#142B49"/>
+ <g transform="translate(970 290)">
+  <circle cx="0" cy="0" r="154" fill="none" stroke="#FFCB50" stroke-width="31" stroke-dasharray="145 60 145 58 145 420" transform="rotate(10)"/>
+  <circle cx="-170" cy="-170" r="44" fill="#FF7A61"/><circle cx="164" cy="-160" r="49" fill="#91DDCA"/><circle cx="-175" cy="165" r="39" fill="#DABDF9"/>
+ </g>
+ <text x="72" y="86" fill="#91DDCA" font-family="DejaVu Sans, Arial" font-size="25" font-weight="700" letter-spacing="4">THIERRY GAROT</text>
+ <text x="65" y="199" fill="#FFF9EF" font-family="DejaVu Sans, Arial" font-size="64" font-weight="800">VOTRE ZONE</text>
+ <text x="65" y="290" fill="#FFCB50" font-family="DejaVu Sans, Arial" font-size="86" font-weight="800">DE GÉNIE</text>
+ <text x="72" y="385" fill="#FFF9EF" font-family="DejaVu Sans, Arial" font-size="33">La conférence participative</text>
+ <text x="72" y="439" fill="#FFF9EF" font-family="DejaVu Sans, Arial" font-size="27">45 min de conférence + 15 min de questions</text>
+ <rect x="72" y="483" width="345" height="68" rx="34" fill="#FFCB50"/>
+ <text x="100" y="527" fill="#142B49" font-family="DejaVu Sans, Arial" font-size="26" font-weight="700">Pour vos équipes</text>
+</svg>

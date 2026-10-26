@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title">
+  <title id="title">Votre Zone de Génie, signe abstrait</title>
+  <rect width="128" height="128" rx="28" fill="#142B49"/>
+  <circle cx="64" cy="64" r="34" fill="none" stroke="#FFCB50" stroke-width="15" stroke-dasharray="52 15 31 18 40 60" transform="rotate(-27 64 64)"/>
+  <circle cx="101" cy="28" r="10" fill="#91DDCA"/>
+  <circle cx="29" cy="101" r="9" fill="#FF7A61"/>
+  <circle cx="93" cy="103" r="6" fill="#DABDF9"/>
+</svg>
