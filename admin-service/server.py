@@ -73,7 +73,7 @@ def send(uid,kind):
 class Handler(BaseHTTPRequestHandler):
  def log_message(self,*args):pass
  def output(self,content,status=200,headers=None):
-  self.send_response(status);self.send_header('Content-Type','text/html; charset=utf-8');self.send_header('Cache-Control','no-store');self.send_header('X-Robots-Tag','noindex, nofollow');self.send_header('Referrer-Policy','no-referrer');self.send_header('X-Content-Type-Options','nosniff');self.send_header('Content-Security-Policy',"default-src 'none'; style-src 'unsafe-inline'; frame-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'self'")
+  self.send_response(status);self.send_header('Content-Type','text/html; charset=utf-8');self.send_header('Cache-Control','no-store');self.send_header('X-Robots-Tag','noindex, nofollow');self.send_header('Referrer-Policy','no-referrer');self.send_header('X-Content-Type-Options','nosniff');self.send_header('Content-Security-Policy',"default-src 'none'; style-src 'unsafe-inline'; frame-src 'self'; form-action 'self' https://www.mollie.com; base-uri 'none'; frame-ancestors 'self'")
   for k,v in (headers or {}).items():self.send_header(k,v)
   self.end_headers();self.wfile.write(content.encode())
  def page(self,body,status=200,headers=None):self.output('<!doctype html><html lang="fr"><meta name="viewport" content="width=device-width,initial-scale=1"><meta charset="utf-8"><title>Votre Zone de Génie · Administration</title><style>'+STYLE+'</style><main><p class="tag">Votre Zone de Génie · Espace privé</p>'+body+'</main></html>',status,headers)
@@ -91,6 +91,9 @@ class Handler(BaseHTTPRequestHandler):
   except Exception as e:self.page('<h1>Action indisponible</h1><p>'+esc(str(e) if isinstance(e,ValueError) else 'Le service externe est indisponible. Réessayez après vérification.')+'</p><a href="/">Retour</a>',400)
  def get(self):
   u=urllib.parse.urlsplit(self.path);q=urllib.parse.parse_qs(u.query)
+  if u.path in ('/gift-status','/cadeau','/gift-return','/gift.pdf','/gifts-admin'):
+   from gifts import get
+   return get(self,u,q)
   if u.path=='/health':return self.output('ok')
   if u.path=='/stats':
    if not self.auth():return self.redirect('/')
@@ -128,7 +131,7 @@ class Handler(BaseHTTPRequestHandler):
    cards+='</div>'
    if uid in answers:cards+='<h3>Réponses facultatives</h3>'+''.join('<p>'+esc(v).replace('\n','<br>')+'</p>' for v in answers[uid])
    cards+='</article>'
-  self.page('<div class="row"><h1>Vos entretiens, votre rythme.</h1><form method="post" action="/logout"><input type="hidden" name="csrf" value="'+csrf+'"><button>Déconnexion</button></form></div><p class="notice">Mode manuel : aucun envoi automatique. Vous choisissez le rendez-vous, relisez le message et confirmez l’envoi. Le guide est proposé à partir d’une heure après la fin prévue.</p><a class="button" href="/stats">📊 Pilotage et statistiques</a> <a class="button" href="/">Actualiser Cal.com</a>'+ (cards or '<article>Aucun rendez-vous de cette offre dans cette page.</article>')+ ('<a href="/?cursor='+esc(pagination['nextCursor'])+'">Page suivante</a>' if pagination.get('nextCursor') else ''))
+  self.page('<div class="row"><h1>Vos entretiens, votre rythme.</h1><form method="post" action="/logout"><input type="hidden" name="csrf" value="'+csrf+'"><button>Déconnexion</button></form></div><p class="notice">Mode manuel : aucun envoi automatique. Vous choisissez le rendez-vous, relisez le message et confirmez l’envoi. Le guide est proposé à partir d’une heure après la fin prévue.</p><a class="button" href="/gifts-admin">Cartes cadeaux et Mollie</a> <a class="button" href="/stats">📊 Pilotage et statistiques</a> <a class="button" href="/">Actualiser Cal.com</a>'+ (cards or '<article>Aucun rendez-vous de cette offre dans cette page.</article>')+ ('<a href="/?cursor='+esc(pagination['nextCursor'])+'">Page suivante</a>' if pagination.get('nextCursor') else ''))
  def do_POST(self):
   try:self.post()
   except Exception as e:self.page('<h1>Action non effectuée</h1><p>'+esc(str(e) if isinstance(e,ValueError) else 'Une erreur est survenue. Vérifiez l’état avant de recommencer.')+'</p><a href="/">Retour</a>',400)
@@ -145,6 +148,9 @@ class Handler(BaseHTTPRequestHandler):
   return self.output('ok',200,{'Access-Control-Allow-Origin':origin})
  def post(self):
   path=urllib.parse.urlsplit(self.path).path
+  if path in ('/gift-checkout','/gift-redeem','/mollie-webhook'):
+   from gifts import post
+   return post(self,path)
   if path=='/analytics/event':return self.analytics_event()
   if self.headers.get('Origin')!=ORIGIN:raise ValueError('Origine de la requête refusée.')
   f=self.form()
