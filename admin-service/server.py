@@ -92,6 +92,10 @@ class Handler(BaseHTTPRequestHandler):
  def get(self):
   u=urllib.parse.urlsplit(self.path);q=urllib.parse.parse_qs(u.query)
   if u.path=='/health':return self.output('ok')
+  if u.path=='/stats':
+   if not self.auth():return self.redirect('/')
+   from analytics import render_dashboard
+   return self.page(render_dashboard())
   if u.path=='/questions':
    t=q.get('t',[''])[0];uid=checktoken(t)
    if not uid:return self.page('<h1>Ce lien a expiré.</h1><p>Vous pouvez tout simplement en parler avec Thierry pendant l’appel.</p>',410)
@@ -124,12 +128,24 @@ class Handler(BaseHTTPRequestHandler):
    cards+='</div>'
    if uid in answers:cards+='<h3>Réponses facultatives</h3>'+''.join('<p>'+esc(v).replace('\n','<br>')+'</p>' for v in answers[uid])
    cards+='</article>'
-  self.page('<div class="row"><h1>Vos entretiens, votre rythme.</h1><form method="post" action="/logout"><input type="hidden" name="csrf" value="'+csrf+'"><button>Déconnexion</button></form></div><p class="notice">Mode manuel : aucun envoi automatique. Vous choisissez le rendez-vous, relisez le message et confirmez l’envoi. Le guide est proposé à partir d’une heure après la fin prévue.</p><a class="button" href="/">Actualiser Cal.com</a>'+ (cards or '<article>Aucun rendez-vous de cette offre dans cette page.</article>')+ ('<a href="/?cursor='+esc(pagination['nextCursor'])+'">Page suivante</a>' if pagination.get('nextCursor') else ''))
+  self.page('<div class="row"><h1>Vos entretiens, votre rythme.</h1><form method="post" action="/logout"><input type="hidden" name="csrf" value="'+csrf+'"><button>Déconnexion</button></form></div><p class="notice">Mode manuel : aucun envoi automatique. Vous choisissez le rendez-vous, relisez le message et confirmez l’envoi. Le guide est proposé à partir d’une heure après la fin prévue.</p><a class="button" href="/stats">📊 Pilotage et statistiques</a> <a class="button" href="/">Actualiser Cal.com</a>'+ (cards or '<article>Aucun rendez-vous de cette offre dans cette page.</article>')+ ('<a href="/?cursor='+esc(pagination['nextCursor'])+'">Page suivante</a>' if pagination.get('nextCursor') else ''))
  def do_POST(self):
   try:self.post()
   except Exception as e:self.page('<h1>Action non effectuée</h1><p>'+esc(str(e) if isinstance(e,ValueError) else 'Une erreur est survenue. Vérifiez l’état avant de recommencer.')+'</p><a href="/">Retour</a>',400)
+ def analytics_event(self):
+  origin=self.headers.get('Origin','')
+  if origin not in ('https://votrezonedegenie.fr','https://www.votrezonedegenie.fr'):
+   return self.output('Origine refusée',403)
+  if int(self.headers.get('Content-Length','0'))>500:return self.output('Données trop volumineuses',413)
+  from analytics import record
+  f=self.form()
+  try:record(f.get('event',''),f.get('path',''))
+  except ValueError:return self.output('Événement invalide',400,{'Access-Control-Allow-Origin':origin})
+  except Exception:return self.output('Collecte indisponible',503,{'Access-Control-Allow-Origin':origin})
+  return self.output('ok',200,{'Access-Control-Allow-Origin':origin})
  def post(self):
   path=urllib.parse.urlsplit(self.path).path
+  if path=='/analytics/event':return self.analytics_event()
   if self.headers.get('Origin')!=ORIGIN:raise ValueError('Origine de la requête refusée.')
   f=self.form()
   if path=='/login':
