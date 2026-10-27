@@ -25,3 +25,14 @@ CREATE TABLE IF NOT EXISTS gift_cards (
 CREATE INDEX IF NOT EXISTS idx_gift_orders_status ON gift_orders(status);
 -- Atomic redemption must check status='active' and update in one SQL transaction.
 -- Never expose code_hash, connection strings, or buyer addresses to the public client.
+
+CREATE TABLE IF NOT EXISTS client_reviews (
+ id CHAR(64) PRIMARY KEY,
+ name TEXT NOT NULL DEFAULT '',
+ email TEXT NOT NULL DEFAULT '',
+ message TEXT NOT NULL,
+ rating SMALLINT CHECK(rating BETWEEN 1 AND 5),
+ publication_consent BOOLEAN NOT NULL DEFAULT FALSE,
+ consent_version TEXT NOT NULL DEFAULT '2026-10-28-v1',
+ created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
