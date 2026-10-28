@@ -99,7 +99,7 @@ class Handler(BaseHTTPRequestHandler):
   if u.path in ('/gift-status','/cadeau','/gift-return','/gift.pdf','/gifts-admin'):
    from gifts import get
    return get(self,u,q)
-  if u.path in ('/reviews-token','/reviews-admin'):
+  if u.path in ('/reviews-token','/reviews-admin','/reviews-public'):
    from reviews import get
    return get(self,u.path)
   if u.path=='/health':return self.output('ok')
@@ -158,10 +158,17 @@ class Handler(BaseHTTPRequestHandler):
   path=urllib.parse.urlsplit(self.path).path
   if path in ('/guide-checkout','/guide-webhook'):
    from guides import post
-   return post(self,path)
+   try:return post(self,path)
+   except Exception as e:
+    if path=='/guide-webhook':return self.output('Réessayer',503)
+    message=str(e) if isinstance(e,ValueError) else 'Le paiement n’a pas pu être préparé. Réessayez sans repayer, ou contactez Thierry.'
+    return self.output('<!doctype html><html lang="fr"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Votre guide · Paiement</title><style>'+STYLE+'</style><main><h1>Revenons à votre guide.</h1><p>'+esc(message)+'</p><a class="button" href="https://votrezonedegenie.fr/guide/">Retour au guide</a><p><a href="mailto:thierry.garot@iroko-conseil.pro">Contacter Thierry</a></p></main></html>',400)
   if path in ('/gift-checkout','/gift-redeem','/mollie-webhook'):
    from gifts import post
    return post(self,path)
+  if path=='/reviews-moderate':
+   from reviews import moderate
+   return moderate(self)
   if path=='/reviews-submit':
    from reviews import post
    return post(self)

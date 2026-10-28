@@ -50,3 +50,9 @@ CREATE TABLE IF NOT EXISTS guide_orders (
  paid_at TIMESTAMPTZ,
  email_status TEXT NOT NULL DEFAULT 'pending' CHECK(email_status IN ('pending','sending','sent','uncertain'))
 );
+
+-- Existing feedback remains unpublished until the owner explicitly approves it.
+ALTER TABLE client_reviews ADD COLUMN IF NOT EXISTS moderation_status TEXT NOT NULL DEFAULT 'pending' CHECK (moderation_status IN ('pending','published','hidden'));
+ALTER TABLE client_reviews ADD COLUMN IF NOT EXISTS published_at TIMESTAMPTZ;
+ALTER TABLE client_reviews ADD COLUMN IF NOT EXISTS moderated_at TIMESTAMPTZ;
+ALTER TABLE client_reviews ADD COLUMN IF NOT EXISTS moderation_reason TEXT NOT NULL DEFAULT '';
