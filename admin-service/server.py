@@ -42,6 +42,8 @@ def booking(uid):
  if not a.get('email') or '\n' in a['email'] or '\r' in a['email']:raise ValueError('Adresse du participant invalide.')
  return b,a
 def template(b,a,kind):
+ from guides import gift_url
+ guide=gift_url(b['uid']) if kind=='after' else ''
  name=esc(a.get('name') or '');greeting='Bonjour '+name+',' if name else 'Bonjour,'
  if kind=='before':
   url=ORIGIN+'/questions?t='+urllib.parse.quote(token(b['uid']))
@@ -49,7 +51,7 @@ def template(b,a,kind):
   body=f'''<p>{greeting}</p><p>Merci pour votre confiance. Je serai heureux de vous écouter lors de notre prochain échange.</p><p>Si vous le souhaitez, vous pouvez partager quelques mots avant notre rendez-vous. Cela prend deux minutes et reste entièrement facultatif : vous pouvez aussi préférer tout me raconter de vive voix.</p><p><a style="display:inline-block;background:#655181;color:#fff;padding:14px 20px;border-radius:8px;text-decoration:none" href="{esc(url)}">Partager quelques mots avant notre échange</a></p><p>Vous n’avez rien à préparer ni à prouver. Venez comme vous êtes.</p><p>À bientôt,<br>Thierry</p>'''
  else:
   subject='Pour laisser notre échange faire son chemin'
-  body=f'''<p>{greeting}</p><p>Merci pour notre conversation.</p><p>Comme promis, voici votre guide <em>Le temps de laisser mûrir</em>. Quelques repères et questions pour revenir, à votre rythme, sur ce qui vous a parlé.</p><p><a style="display:inline-block;background:#655181;color:#fff;padding:14px 20px;border-radius:8px;text-decoration:none" href="{GUIDE}">Télécharger mon guide</a></p><p>Vous n’avez rien à compléter ni à me renvoyer. Gardez simplement ce qui vous est utile.</p><p>Si vous en avez envie, vous pouvez aussi me dire comment vous avez vécu notre échange : ce qui vous a été utile, ce qui vous a manqué ou ce que vous auriez aimé différent. Votre retour m’aide à faire évoluer mon accompagnement.</p><p><a href="https://votrezonedegenie.fr/avis/">Partager mon avis sur notre échange</a></p><p>Cette démarche est facultative. Vous pouvez laisser mûrir et revenir plus tard.</p><p>Prenez soin de vous,<br>Thierry</p>'''
+  body=f'''<p>{greeting}</p><p>Merci pour notre conversation.</p><p>Comme promis, voici votre guide <em>Le temps de laisser mûrir</em>. Quelques repères et questions pour revenir, à votre rythme, sur ce qui vous a parlé.</p><p><a style="display:inline-block;background:#655181;color:#fff;padding:14px 20px;border-radius:8px;text-decoration:none" href="{esc(guide)}">Télécharger mon guide</a></p><p>Vous n’avez rien à compléter ni à me renvoyer. Gardez simplement ce qui vous est utile.</p><p>Si vous en avez envie, vous pouvez aussi me dire comment vous avez vécu notre échange : ce qui vous a été utile, ce qui vous a manqué ou ce que vous auriez aimé différent. Votre retour m’aide à faire évoluer mon accompagnement.</p><p><a href="https://votrezonedegenie.fr/avis/">Partager mon avis sur notre échange</a></p><p>Cette démarche est facultative. Vous pouvez laisser mûrir et revenir plus tard.</p><p>Prenez soin de vous,<br>Thierry</p>'''
  return subject,f'''<!doctype html><html lang="fr"><meta charset="utf-8"><body style="margin:0;background:#faf7f2;color:#233345;font:16px/1.7 Arial,sans-serif"><div style="max-width:600px;margin:auto;padding:32px 20px"><p style="color:#655181;letter-spacing:2px;font-size:12px">VOTRE ZONE DE GÉNIE</p><h1 style="font:30px/1.2 Georgia,serif">{esc(subject)}</h1>{body}<hr style="border:0;border-top:1px solid #ddd"><small>Thierry Garot · Votre Zone de Génie<br>Un échange humain, à votre rythme.</small></div></body></html>'''
 def eligible(b,kind):
  end=datetime.fromisoformat(b['end'].replace('Z','+00:00'))
@@ -62,7 +64,7 @@ def send(uid,kind):
  with db() as c:
   try:c.execute('INSERT INTO deliveries VALUES(?,?,?,?,?)',(uid,kind,a['email'],'envoi en cours',datetime.now(timezone.utc).isoformat()))
   except sqlite3.IntegrityError:raise ValueError('Un envoi existe déjà pour ce message. Aucun nouvel envoi effectué ; vérifier l’historique.')
- msg=EmailMessage();msg['From']='Thierry · Votre Zone de Génie <'+E['MAIL_FROM']+'>';msg['To']=a['email'];msg['Reply-To']=E['MAIL_FROM'];msg['Subject']=subject;msg['Message-ID']='<'+hashlib.sha256((uid+kind).encode()).hexdigest()+'@votrezonedegenie.fr>';msg.set_content('Merci pour notre échange. Retrouvez votre guide : '+GUIDE+'\nSi vous le souhaitez, partagez votre avis : https://votrezonedegenie.fr/avis/\nVotre retour reste privé sauf accord explicite de publication. À bientôt, Thierry.' if kind=='after' else 'Merci pour votre confiance. Vous n’avez rien à préparer ni à prouver. À bientôt, Thierry.');msg.add_alternative(body,subtype='html')
+ msg=EmailMessage();msg['From']='Thierry · Votre Zone de Génie <'+E['MAIL_FROM']+'>';msg['To']=a['email'];msg['Reply-To']=E['MAIL_FROM'];msg['Subject']=subject;msg['Message-ID']='<'+hashlib.sha256((uid+kind).encode()).hexdigest()+'@votrezonedegenie.fr>';msg.set_content('Merci pour notre échange. Retrouvez votre guide : '+__import__('guides').gift_url(uid)+'\nSi vous le souhaitez, partagez votre avis : https://votrezonedegenie.fr/avis/\nVotre retour reste privé sauf accord explicite de publication. À bientôt, Thierry.' if kind=='after' else 'Merci pour votre confiance. Vous n’avez rien à préparer ni à prouver. À bientôt, Thierry.');msg.add_alternative(body,subtype='html')
  try:
   with smtplib.SMTP_SSL(E['SMTP_HOST'],int(E.get('SMTP_PORT','465')),timeout=30,context=ssl.create_default_context()) as smtp:
    smtp.login(E['SMTP_USER'],E['SMTP_PASSWORD']);smtp.send_message(msg)
@@ -91,10 +93,13 @@ class Handler(BaseHTTPRequestHandler):
   except Exception as e:self.page('<h1>Action indisponible</h1><p>'+esc(str(e) if isinstance(e,ValueError) else 'Le service externe est indisponible. Réessayez après vérification.')+'</p><a href="/">Retour</a>',400)
  def get(self):
   u=urllib.parse.urlsplit(self.path);q=urllib.parse.parse_qs(u.query)
+  if u.path in ('/guide-config','/guide-access','/guide.pdf','/guides-admin'):
+   from guides import get
+   return get(self,u,q)
   if u.path in ('/gift-status','/cadeau','/gift-return','/gift.pdf','/gifts-admin'):
    from gifts import get
    return get(self,u,q)
-  if u.path in ('/reviews-token','/reviews-admin'):
+  if u.path in ('/reviews-token','/reviews-admin','/reviews-public'):
    from reviews import get
    return get(self,u.path)
   if u.path=='/health':return self.output('ok')
@@ -134,7 +139,7 @@ class Handler(BaseHTTPRequestHandler):
    cards+='</div>'
    if uid in answers:cards+='<h3>Réponses facultatives</h3>'+''.join('<p>'+esc(v).replace('\n','<br>')+'</p>' for v in answers[uid])
    cards+='</article>'
-  self.page('<div class="row"><h1>Vos entretiens, votre rythme.</h1><form method="post" action="/logout"><input type="hidden" name="csrf" value="'+csrf+'"><button>Déconnexion</button></form></div><p class="notice">Mode manuel : aucun envoi automatique. Vous choisissez le rendez-vous, relisez le message et confirmez l’envoi. Le guide est proposé à partir d’une heure après la fin prévue.</p><a class="button" href="/gifts-admin">Cartes cadeaux et Mollie</a> <a class="button" href="/reviews-admin">Avis reçus</a> <a class="button" href="/stats">📊 Pilotage et statistiques</a> <a class="button" href="/">Actualiser Cal.com</a>'+ (cards or '<article>Aucun rendez-vous de cette offre dans cette page.</article>')+ ('<a href="/?cursor='+esc(pagination['nextCursor'])+'">Page suivante</a>' if pagination.get('nextCursor') else ''))
+  self.page('<div class="row"><h1>Vos entretiens, votre rythme.</h1><form method="post" action="/logout"><input type="hidden" name="csrf" value="'+csrf+'"><button>Déconnexion</button></form></div><p class="notice">Mode manuel : aucun envoi automatique. Vous choisissez le rendez-vous, relisez le message et confirmez l’envoi. Le guide est proposé à partir d’une heure après la fin prévue.</p><a class="button" href="/gifts-admin">Cartes cadeaux et Mollie</a> <a class="button" href="/guides-admin">Ventes du guide</a> <a class="button" href="/reviews-admin">Avis reçus</a> <a class="button" href="/stats">📊 Pilotage et statistiques</a> <a class="button" href="/">Actualiser Cal.com</a>'+ (cards or '<article>Aucun rendez-vous de cette offre dans cette page.</article>')+ ('<a href="/?cursor='+esc(pagination['nextCursor'])+'">Page suivante</a>' if pagination.get('nextCursor') else ''))
  def do_POST(self):
   try:self.post()
   except Exception as e:self.page('<h1>Action non effectuée</h1><p>'+esc(str(e) if isinstance(e,ValueError) else 'Une erreur est survenue. Vérifiez l’état avant de recommencer.')+'</p><a href="/">Retour</a>',400)
@@ -151,9 +156,19 @@ class Handler(BaseHTTPRequestHandler):
   return self.output('ok',200,{'Access-Control-Allow-Origin':origin})
  def post(self):
   path=urllib.parse.urlsplit(self.path).path
+  if path in ('/guide-checkout','/guide-webhook'):
+   from guides import post
+   try:return post(self,path)
+   except Exception as e:
+    if path=='/guide-webhook':return self.output('Réessayer',503)
+    message=str(e) if isinstance(e,ValueError) else 'Le paiement n’a pas pu être préparé. Réessayez sans repayer, ou contactez Thierry.'
+    return self.output('<!doctype html><html lang="fr"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Votre guide · Paiement</title><style>'+STYLE+'</style><main><h1>Revenons à votre guide.</h1><p>'+esc(message)+'</p><a class="button" href="https://votrezonedegenie.fr/guide/">Retour au guide</a><p><a href="mailto:thierry.garot@iroko-conseil.pro">Contacter Thierry</a></p></main></html>',400)
   if path in ('/gift-checkout','/gift-redeem','/mollie-webhook'):
    from gifts import post
    return post(self,path)
+  if path=='/reviews-moderate':
+   from reviews import moderate
+   return moderate(self)
   if path=='/reviews-submit':
    from reviews import post
    return post(self)

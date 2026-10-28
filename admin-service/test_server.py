@@ -4,9 +4,9 @@ from datetime import datetime,timedelta,timezone
 s=importlib.util.spec_from_file_location('admin','server.py');m=importlib.util.module_from_spec(s);s.loader.exec_module(m)
 class Test(unittest.TestCase):
  def setUp(self):
-  self.tmp=tempfile.TemporaryDirectory();m.DB=self.tmp.name+'/test.sqlite';m.SECRET='test-secret';m.ORIGIN='https://admin.example';m.db().close()
+  self.envpatch=patch.dict(os.environ,{'SESSION_SECRET':'test-session-secret-long-enough'});self.envpatch.start();self.tmp=tempfile.TemporaryDirectory();m.DB=self.tmp.name+'/test.sqlite';m.SECRET='test-secret';m.ORIGIN='https://admin.example';m.db().close()
   self.b={'uid':'booking-uid','eventTypeId':m.EVENT_ID,'status':'accepted','end':(datetime.now(timezone.utc)-timedelta(hours=2)).isoformat(),'attendees':[{'name':'<script>alert(1)</script>','email':'client@example.com'}]}
- def tearDown(self):self.tmp.cleanup()
+ def tearDown(self):self.tmp.cleanup();self.envpatch.stop()
  def test_signed_form_token(self):
   t=m.token('a');self.assertEqual(m.checktoken(t),'a');self.assertIsNone(m.checktoken(t+'x'))
  def test_other_offers_rejected(self):
