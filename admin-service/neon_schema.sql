@@ -36,3 +36,17 @@ CREATE TABLE IF NOT EXISTS client_reviews (
  consent_version TEXT NOT NULL DEFAULT '2026-10-28-v1',
  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+CREATE TABLE IF NOT EXISTS guide_orders (
+ id UUID PRIMARY KEY,
+ stripe_session_id TEXT UNIQUE,
+ payment_intent_id TEXT,
+ buyer_email TEXT NOT NULL DEFAULT '',
+ amount_cents INTEGER NOT NULL DEFAULT 1500 CHECK(amount_cents=1500),
+ currency TEXT NOT NULL DEFAULT 'eur' CHECK(currency='eur'),
+ status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','paid','expired','revoked')),
+ consent_version TEXT NOT NULL,
+ created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+ paid_at TIMESTAMPTZ,
+ email_status TEXT NOT NULL DEFAULT 'pending' CHECK(email_status IN ('pending','sending','sent','uncertain'))
+);
