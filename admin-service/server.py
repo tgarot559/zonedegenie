@@ -103,6 +103,10 @@ class Handler(BaseHTTPRequestHandler):
    from reviews import get
    return get(self,u.path)
   if u.path=='/health':return self.output('ok')
+  if u.path=='/pilotage-2fb1c941fae6e5e95b0203d4':
+   if not self.auth():return self.redirect('/')
+   from strategy_admin import render
+   return self.page(render(sign(self.auth())))
   if u.path=='/stats':
    if not self.auth():return self.redirect('/')
    from analytics import render_dashboard
@@ -139,7 +143,7 @@ class Handler(BaseHTTPRequestHandler):
    cards+='</div>'
    if uid in answers:cards+='<h3>Réponses facultatives</h3>'+''.join('<p>'+esc(v).replace('\n','<br>')+'</p>' for v in answers[uid])
    cards+='</article>'
-  self.page('<div class="row"><h1>Vos entretiens, votre rythme.</h1><form method="post" action="/logout"><input type="hidden" name="csrf" value="'+csrf+'"><button>Déconnexion</button></form></div><p class="notice">Mode manuel : aucun envoi automatique. Vous choisissez le rendez-vous, relisez le message et confirmez l’envoi. Le guide est proposé à partir d’une heure après la fin prévue.</p><a class="button" href="/gifts-admin">Cartes cadeaux et Mollie</a> <a class="button" href="/guides-admin">Ventes du guide</a> <a class="button" href="/reviews-admin">Avis reçus</a> <a class="button" href="/stats">📊 Pilotage et statistiques</a> <a class="button" href="/">Actualiser Cal.com</a>'+ (cards or '<article>Aucun rendez-vous de cette offre dans cette page.</article>')+ ('<a href="/?cursor='+esc(pagination['nextCursor'])+'">Page suivante</a>' if pagination.get('nextCursor') else ''))
+  self.page('<div class="row"><h1>Vos entretiens, votre rythme.</h1><form method="post" action="/logout"><input type="hidden" name="csrf" value="'+csrf+'"><button>Déconnexion</button></form></div><p class="notice">Mode manuel : aucun envoi automatique. Vous choisissez le rendez-vous, relisez le message et confirmez l’envoi. Le guide est proposé à partir d’une heure après la fin prévue.</p><a class="button" href="/gifts-admin">Cartes cadeaux et Mollie</a> <a class="button" href="/guides-admin">Ventes du guide</a> <a class="button" href="/reviews-admin">Avis reçus</a> <a class="button" href="/stats">📊 Pilotage et statistiques</a> <a class="button" href="/pilotage-2fb1c941fae6e5e95b0203d4">🔒 Mon cockpit Stratégie</a> <a class="button" href="/">Actualiser Cal.com</a>'+ (cards or '<article>Aucun rendez-vous de cette offre dans cette page.</article>')+ ('<a href="/?cursor='+esc(pagination['nextCursor'])+'">Page suivante</a>' if pagination.get('nextCursor') else ''))
  def do_POST(self):
   try:self.post()
   except Exception as e:self.page('<h1>Action non effectuée</h1><p>'+esc(str(e) if isinstance(e,ValueError) else 'Une erreur est survenue. Vérifiez l’état avant de recommencer.')+'</p><a href="/">Retour</a>',400)
@@ -190,6 +194,10 @@ class Handler(BaseHTTPRequestHandler):
    return self.page('<h1>Merci pour vos mots.</h1><p>Thierry pourra les lire avant votre échange. À bientôt, et venez comme vous êtes.</p>')
   s=self.auth()
   if not s or not hmac.compare_digest(sign(s),f.get('csrf','')):raise ValueError('Session expirée. Reconnectez-vous.')
+  if path in ('/strategy/client','/strategy/session'):
+   from strategy_admin import act,PRIVATE_PATH
+   act(path,f)
+   return self.redirect(PRIVATE_PATH)
   if path=='/logout':return self.redirect('/',{'Set-Cookie':'zdg=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0'})
   if path=='/send':
    kind=f.get('kind')
