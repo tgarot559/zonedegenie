@@ -5,7 +5,7 @@ No browser-accessible client API or unauthenticated data endpoint is exported.
 """
 import html
 from decimal import Decimal, InvalidOperation
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from neon_db import connection
 
 PRIVATE_PATH = "/pilotage-2fb1c941fae6e5e95b0203d4"
@@ -59,7 +59,7 @@ def _card(title, value, caption):
     return ('<div class="stat"><small>'+esc(title)+'</small><strong>'+esc(value)+
             '</strong><span>'+esc(caption)+'</span></div>')
 
-def render(csrf):
+def render(csrf, bookings=None):
     with connection() as conn:
         with conn.cursor() as cur:
             prepare(cur)
@@ -79,11 +79,23 @@ def render(csrf):
                          WHERE day >= (now() AT TIME ZONE 'Europe/Paris')::date - 29
                          AND event LIKE 'strategy_%' GROUP BY event""")
             signals = dict(cur.fetchall())
+    related_ids = {7802343,7803169,7803168,7803004,7803018,7803019}
+    matched = [b for b in (bookings or []) if b.get("eventTypeId",b.get("eventType",{}).get("id")) in related_ids]
+    recent = []
+    start = datetime.now(timezone.utc) - timedelta(days=30)
+    for b in matched:
+        try:
+            dt = datetime.fromisoformat(b["start"].replace("Z","+00:00"))
+            if dt >= start and b.get("status","").lower() in ("accepted","confirmed"):
+                recent.append(b)
+        except (ValueError, KeyError, TypeError):
+            continue
     cards = ''.join([
         _card("Pages Stratégie vues", signals.get("strategy_page",0), "Vues et non visiteurs uniques · 30 jours"),
         _card("Clics vers échanges gratuits", signals.get("strategy_click_free",0), "Départs vers Cal.com"),
         _card("Clics vers mentorat", signals.get("strategy_click_mentorat",0), "Intention de réservation"),
         _card("Clics CODIR / partenariat", signals.get("strategy_click_b2b",0), "Demandes de cadrage"),
+        _card("Réservations confirmées", len(recent) if bookings is not None else "—", "Cal.com · 30 derniers jours, données limitées aux 100 dernières réservations"),
         _card("Clients suivis", len(clients), "Saisie manuelle, pas une synchronisation de paiement"),
         _card("Minutes de séances saisies", sum(row[7] for row in clients), "Consommation confirmée manuellement")
     ])
@@ -104,6 +116,11 @@ def render(csrf):
     if not lines:
         lines='<tr><td colspan="5">Aucun client enregistré. Commencer par un forfait dont le paiement a été vérifié.</td></tr>'
     history=''.join('<tr><td>'+esc(name)+'</td><td>'+esc(day)+'</td><td>'+esc(minutes)+' min</td><td>'+esc(note)+'</td><td>'+esc(actions)+'</td></tr>' for cid,name,day,minutes,note,actions in sessions)
+    booking_rows = ""
+    for b in recent[:25]:
+        attendee=(b.get("attendees") or [{}])[0]
+        event_id=b.get("eventTypeId",b.get("eventType",{}).get("id"))
+        booking_rows+='<tr><td>'+esc(attendee.get("name","Participant"))+'</td><td>'+esc(b.get("start",""))+'</td><td>'+esc(event_id)+'</td><td>'+esc(b.get("status",""))+'</td></tr>'
     options=''.join('<option value="'+esc(slug)+'">'+esc(label)+'</option>' for slug,(label,_) in OFFERS.items())
     return """<style>
     .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
@@ -117,6 +134,7 @@ def render(csrf):
     <h1>Pilotage · Stratégie & mentorat</h1>
     <p class="warning">Espace privé. Les clics sont des intentions, pas des réservations ni des paiements. Les clients et les heures sont enregistrés manuellement après vérification. Ne jamais enregistrer de données sensibles non nécessaires.</p>
     <div class="stats">"""+cards+"""</div>
+    <article><h2>Rendez-vous Cal.com · Conversion observée</h2><p>La collecte relie les vues et clics agrégés du site aux réservations confirmées. Elle ne suit pas les personnes individuellement et ne permet pas d'attribuer précisément chaque réservation à un clic, ni de constater le paiement. Les données Cal.com sont partielles si plus de 100 réservations ont eu lieu.</p><div class="table-scroll"><table><thead><tr><th>Participant</th><th>Date</th><th>Type Cal.com</th><th>Statut</th></tr></thead><tbody>"""+(booking_rows or '<tr><td colspan="4">Aucune réservation de stratégie trouvée dans la fenêtre consultée, ou connexion Cal.com indisponible.</td></tr>')+"""</tbody></table></div></article>
     <article class="wide"><h2>Ajouter un client / forfait</h2>
       <form method="post" action="/strategy/client">
       <input type="hidden" name="csrf" value=""""+esc(csrf)+"""">
