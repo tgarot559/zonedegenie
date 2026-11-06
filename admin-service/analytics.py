@@ -3,8 +3,8 @@ import os, html
 from datetime import datetime, timezone, timedelta
 import psycopg
 
-EVENTS = {"page_home", "page_cadeau", "click_reserver", "click_cadeau", "click_interet_cadeau"}
-ALLOWED_PATHS = {"/", "/cadeau/", "/cadeau"}
+EVENTS = {"page_home", "page_cadeau", "click_reserver", "click_cadeau", "click_interet_cadeau", "strategy_page", "strategy_click_free", "strategy_click_mentorat", "strategy_click_b2b"}
+ALLOWED_PATHS = {"/", "/cadeau/", "/cadeau", "/strategie/", "/strategie"}
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS analytics_daily (
  day DATE NOT NULL,
