@@ -106,7 +106,11 @@ class Handler(BaseHTTPRequestHandler):
   if u.path=='/pilotage-2fb1c941fae6e5e95b0203d4':
    if not self.auth():return self.redirect('/')
    from strategy_admin import render
-   return self.page(render(sign(self.auth())))
+   try:
+    latest,_=cal('bookings?take=100&sortStart=desc')
+   except Exception:
+    latest=None
+   return self.page(render(sign(self.auth()),latest))
   if u.path=='/stats':
    if not self.auth():return self.redirect('/')
    from analytics import render_dashboard
