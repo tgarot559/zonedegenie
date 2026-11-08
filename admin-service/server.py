@@ -7,6 +7,7 @@ E=os.environ
 DB=E.get('DATA_PATH','./data/zdg-admin.sqlite3')
 SECRET=E.get('SESSION_SECRET','')
 PASSWORD=E.get('ADMIN_PASSWORD','')
+ADMIN_EMAIL=E.get('ADMIN_EMAIL','').strip().casefold()
 ORIGIN=E.get('PUBLIC_ORIGIN','').rstrip('/')
 GUIDE='https://votrezonedegenie.fr/documents/le-temps-de-laisser-murir.pdf'
 EVENT_ID=7609933
@@ -124,8 +125,8 @@ class Handler(BaseHTTPRequestHandler):
    return self.page('<h1>Quelques mots avant notre échange.</h1><p>Deux minutes, si vous le souhaitez. Toutes les questions sont facultatives. Vous pouvez aussi préférer tout raconter de vive voix.</p>'+('<p class="notice">Vos réponses ont déjà été reçues.</p>' if row else '<form method="post" action="/questions"><input type="hidden" name="token" value="'+esc(t)+'">'+fields+'<p class="muted">Ces réponses seront accessibles à Thierry pour préparer votre échange. Évitez les informations sensibles. Elles seront supprimées après 60 jours.</p><button>Transmettre mes réponses à Thierry</button></form>'))
   session=self.auth()
   if not session:
-   if not SECRET or not PASSWORD:return self.page('<h1>Installation en cours.</h1><p>L’accès privé doit être configuré avant toute connexion.</p>',503)
-   return self.page('<h1>Bonjour Thierry.</h1><p>Votre espace de suivi des entretiens.</p><form method="post" action="/login"><label>Mot de passe administrateur<input name="password" type="password" autocomplete="current-password" required></label><button>Ouvrir mon espace</button></form>')
+   if not SECRET or not PASSWORD or not ADMIN_EMAIL:return self.page('<h1>Installation en cours.</h1><p>L’accès privé doit être configuré avant toute connexion.</p>',503)
+   return self.page('<h1>Bonjour Thierry.</h1><p>Votre espace de suivi des entretiens.</p><form method="post" action="/login"><label>Adresse e-mail<input name="email" type="email" autocomplete="username" required></label><label>Mot de passe administrateur<input name="password" type="password" autocomplete="current-password" required></label><button>Ouvrir mon espace</button></form>')
   csrf=sign(session)
   if u.path=='/preview':
    uid=q.get('uid',[''])[0];kind=q.get('kind',[''])[0]
@@ -184,10 +185,12 @@ class Handler(BaseHTTPRequestHandler):
   if self.headers.get('Origin')!=ORIGIN:raise ValueError('Origine de la requête refusée.')
   f=self.form()
   if path=='/login':
-   if not SECRET or not PASSWORD:raise ValueError('Installation non terminée.')
+   if not SECRET or not PASSWORD or not ADMIN_EMAIL:raise ValueError('Installation non terminée.')
    ip=self.client_address[0];n,until=FAILURES.get(ip,(0,0))
    if until>time.time():raise ValueError('Trop de tentatives. Patientez 15 minutes.')
-   if not hmac.compare_digest(f.get('password',''),PASSWORD):FAILURES[ip]=(n+1,time.time()+900 if n>=4 else 0);raise ValueError('Connexion refusée.')
+   valid_email=hmac.compare_digest(f.get('email','').strip().casefold(),ADMIN_EMAIL)
+   valid_password=hmac.compare_digest(f.get('password',''),PASSWORD)
+   if not (valid_email and valid_password):FAILURES[ip]=(n+1,time.time()+900 if n>=4 else 0);raise ValueError('Connexion refusée.')
    FAILURES.pop(ip,None);s=str(int(time.time()))+'.'+secrets.token_hex(24);s+='.'+sign(s)
    return self.redirect('/',{'Set-Cookie':'zdg='+s+'; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=28800'})
   if path=='/questions':
