@@ -137,7 +137,12 @@ class Handler(BaseHTTPRequestHandler):
    return self.page(f'<a href="/">← Rendez-vous</a><h1>Vérifier avant d’envoyer.</h1><p>Destinataire : <strong>{esc(a["name"])} · {esc(a["email"])}</strong><br>Objet : {esc(subject)}</p><iframe title="Aperçu du message" sandbox src="/preview?uid={esc(uid)}&kind={kind}&body=1"></iframe><form method="post" action="/send"><input type="hidden" name="csrf" value="{csrf}"><input type="hidden" name="uid" value="{esc(uid)}"><input type="hidden" name="kind" value="{kind}"><label><input type="checkbox" name="confirm" required> Je vérifie le destinataire et je confirme cet envoi.</label>'+('<label><input type="checkbox" name="paid" required> J’ai vérifié dans Cal.com que le paiement est bien reçu.</label>' if kind=='before' else '<label><input type="checkbox" name="held" required> Cet entretien a bien eu lieu.</label>')+'<button>Confirmer et envoyer cet e-mail</button></form>')
   if u.path!='/':return self.page('<h1>Page introuvable</h1>',404)
   cursor=q.get('cursor',[''])[0]
-  data,pagination=cal('bookings?take=50&eventTypeId=7609933&sortStart=desc'+('&cursor='+urllib.parse.quote(cursor,safe='') if cursor else ''))
+  cal_notice=''
+  try:
+   data,pagination=cal('bookings?take=50&eventTypeId=7609933&sortStart=desc'+('&cursor='+urllib.parse.quote(cursor,safe='') if cursor else ''))
+  except Exception:
+   data,pagination=[],{}
+   cal_notice='<p class="notice">La synchronisation Cal.com est momentanément indisponible. Vous pouvez utiliser les autres fonctions de l’administration. Vérifiez la connexion Cal.com avant tout envoi lié à un rendez-vous.</p>'
   with db() as c:
    c.execute("DELETE FROM answers WHERE at < datetime('now','-60 days')");history={(r[0],r[1]):r[2] for r in c.execute('SELECT uid,kind,status FROM deliveries')};answers={r[0]:json.loads(r[1]) for r in c.execute('SELECT uid,payload FROM answers')}
   cards=''
@@ -148,7 +153,7 @@ class Handler(BaseHTTPRequestHandler):
    cards+='</div>'
    if uid in answers:cards+='<h3>Réponses facultatives</h3>'+''.join('<p>'+esc(v).replace('\n','<br>')+'</p>' for v in answers[uid])
    cards+='</article>'
-  self.page('<div class="row"><h1>Vos entretiens, votre rythme.</h1><form method="post" action="/logout"><input type="hidden" name="csrf" value="'+csrf+'"><button>Déconnexion</button></form></div><p class="notice">Mode manuel : aucun envoi automatique. Vous choisissez le rendez-vous, relisez le message et confirmez l’envoi. Le guide est proposé à partir d’une heure après la fin prévue.</p><a class="button" href="/gifts-admin">Cartes cadeaux et Mollie</a> <a class="button" href="/guides-admin">Ventes du guide</a> <a class="button" href="/reviews-admin">Avis reçus</a> <a class="button" href="/stats">📊 Pilotage et statistiques</a> <a class="button" href="/pilotage-2fb1c941fae6e5e95b0203d4">🔒 Mon cockpit Stratégie</a> <a class="button" href="/">Actualiser Cal.com</a>'+ (cards or '<article>Aucun rendez-vous de cette offre dans cette page.</article>')+ ('<a href="/?cursor='+esc(pagination['nextCursor'])+'">Page suivante</a>' if pagination.get('nextCursor') else ''))
+  self.page('<div class="row"><h1>Vos entretiens, votre rythme.</h1><form method="post" action="/logout"><input type="hidden" name="csrf" value="'+csrf+'"><button>Déconnexion</button></form></div>'+cal_notice+'<p class="notice">Mode manuel : aucun envoi automatique. Vous choisissez le rendez-vous, relisez le message et confirmez l’envoi. Le guide est proposé à partir d’une heure après la fin prévue.</p><a class="button" href="/gifts-admin">Cartes cadeaux et Mollie</a> <a class="button" href="/guides-admin">Ventes du guide</a> <a class="button" href="/reviews-admin">Avis reçus</a> <a class="button" href="/stats">📊 Pilotage et statistiques</a> <a class="button" href="/pilotage-2fb1c941fae6e5e95b0203d4">🔒 Mon cockpit Stratégie</a> <a class="button" href="/">Actualiser Cal.com</a>'+ (cards or ('<article>Les rendez-vous ne sont pas disponibles pour le moment.</article>' if cal_notice else '<article>Aucun rendez-vous de cette offre dans cette page.</article>'))+ ('<a href="/?cursor='+esc(pagination['nextCursor'])+'">Page suivante</a>' if pagination.get('nextCursor') else ''))
  def do_POST(self):
   try:self.post()
   except Exception as e:self.page('<h1>Action non effectuée</h1><p>'+esc(str(e) if isinstance(e,ValueError) else 'Une erreur est survenue. Vérifiez l’état avant de recommencer.')+'</p><a href="/">Retour</a>',400)
