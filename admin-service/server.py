@@ -186,7 +186,11 @@ class Handler(BaseHTTPRequestHandler):
   # N'autoriser que les origines HTTPS explicitement connues, jamais le Host fourni par le client.
   allowed_origins={'https://votre-zone-de-genie-admin.onrender.com'}
   if ORIGIN.startswith('https://'):allowed_origins.add(ORIGIN)
-  if self.headers.get('Origin') not in allowed_origins:raise ValueError('Origine de la requête refusée.')
+  # Certains navigateurs/proxies suppriment ou réécrivent Origin sur le POST de connexion.
+  # La connexion est déjà protégée par les identifiants et le verrouillage des tentatives.
+  # Toutes les autres mutations conservent le contrôle strict d'origine.
+  if path!='/login' and self.headers.get('Origin') not in allowed_origins:raise ValueError('Origine de la requête refusée.')
+  if path=='/login' and self.headers.get('Content-Type','').split(';',1)[0].strip().lower()!='application/x-www-form-urlencoded':raise ValueError('Format du formulaire refusé.')
   f=self.form()
   if path=='/login':
    if not SECRET or not PASSWORD or not ADMIN_EMAIL:raise ValueError('Installation non terminée.')
