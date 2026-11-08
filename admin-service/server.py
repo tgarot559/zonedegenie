@@ -182,7 +182,11 @@ class Handler(BaseHTTPRequestHandler):
    from reviews import post
    return post(self)
   if path=='/analytics/event':return self.analytics_event()
-  if self.headers.get('Origin')!=ORIGIN:raise ValueError('Origine de la requête refusée.')
+  # Le domaine public du site et l'hôte du tableau de bord sont distincts.
+  # N'autoriser que les origines HTTPS explicitement connues, jamais le Host fourni par le client.
+  allowed_origins={'https://votre-zone-de-genie-admin.onrender.com'}
+  if ORIGIN.startswith('https://'):allowed_origins.add(ORIGIN)
+  if self.headers.get('Origin') not in allowed_origins:raise ValueError('Origine de la requête refusée.')
   f=self.form()
   if path=='/login':
    if not SECRET or not PASSWORD or not ADMIN_EMAIL:raise ValueError('Installation non terminée.')
